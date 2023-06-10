@@ -7,11 +7,9 @@
 # VARIABLES
 dir=$(pwd)
 user=$(whoami)
-aurhelper="yay"
 
 aur_install() {
-	echo "$aurinstalled" | grep -q "^$1$" && return 1
-	sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
+	sudo pacman -S --needed git base-devel --noconfirm && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm
 }
 
 add_repos() {
@@ -46,17 +44,10 @@ dotfiles_configure() {
 	sudo cp -r $dir/dotfiles/wallpapers /usr/share/
 }
 
-# Run OhMyZsh script (not written by me)
-
-zsh_configure() {
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-}
-
 # The actual script (very barebones as you can tell)
 
-aur_install yay && aur_packages
-add_repos
+aur_install && add_repos && aur_packages
 pacman_packages && systemd_services
 dotfiles_configure
-zsh_configure
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 clear ; echo "Installation complete. Please restart your computer."
